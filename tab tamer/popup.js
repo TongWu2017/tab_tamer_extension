@@ -1,21 +1,19 @@
-document.addEventListener('DOMContentLoaded', function() {
-    showPage(1);
-  });
-  
-  function showPage(pageNumber) {
-    var contentDiv = document.getElementById('content');
-    var pageUrl = chrome.extension.getURL('page' + pageNumber + '.html');
-  
-    fetch(pageUrl)
-      .then(response => response.text())
-      .then(html => {
-        contentDiv.innerHTML = html;
-        addPageScript(pageNumber);
-      });
-  }
-  
-  function addPageScript(pageNumber) {
-    var script = document.createElement('script');
-    script.src = 'page' + pageNumber + '.js';
-    document.head.appendChild(script);
-  }
+document.addEventListener('DOMContentLoaded', async function () {
+  const started = await chrome.storage.local.get("started");
+  console.log(started);
+  const start = (started.started == undefined) ? "start" : "main";
+  var contentDiv = document.getElementById('content');
+  fetch(chrome.runtime.getURL(`${start}/${start}.html`))
+    .then(response => response.text())
+    .then(html => {
+      contentDiv.innerHTML = html;
+      addPageScript(`${start}/${start}.js`);
+    });
+});
+
+function addPageScript(scriptName) {
+  var script = document.createElement(`script`);
+  script.src = scriptName;
+  document.head.appendChild(script);
+}
+
