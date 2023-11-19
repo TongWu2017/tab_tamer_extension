@@ -1,8 +1,8 @@
 {
-    "manifest_version": 1,
+    "manifest_version": 3,
     "name": "Tab Tamer",
-    "version": "1.0.1",
-    "browser_action": {
+    "version": "1.0",
+    "action": {
         "default_popup": "popup.html"
       }   
 }
