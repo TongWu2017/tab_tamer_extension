@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 document.getElementById("settings").addEventListener("click", gotoSettings);
 document.getElementById("inventory").addEventListener("click", gotoinventory);
+document.getElementById("startSession").addEventListener("click", start);
 
 function gotoSettings() {
   
@@ -32,4 +33,9 @@ function gotoSettings() {
         loadDivs("unproductive");
       });
   
+  }
+
+  function start() {
+    chrome.windows.create({url: "moveablepopup/moveablepopup.html", type: "popup"});
+    chrome.storage.local.set({from: "tabtamerStart", tracking: true});
   }

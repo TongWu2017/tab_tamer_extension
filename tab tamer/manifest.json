@@ -9,8 +9,7 @@
     "storage",
     "tabs",
     "activeTab",
-    "scripting",
-    "<all_urls>"
+    "scripting"
   ],
   "host_permissions": [
     "http://*/*",
