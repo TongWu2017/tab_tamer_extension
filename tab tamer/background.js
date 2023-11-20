@@ -17,6 +17,9 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
         }
     }
     if (message.from == "tabtamerRequestPetStatus") {
+        if (!statusLoaded) {
+            await loadPetStatus();
+        }
         chrome.runtime.sendMessage({
             from: "tabtamerBackground",
             petName: message.petName,
@@ -37,6 +40,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
         await loadPetStatus();
     }
     happiness += productive;
+    if (productive > 0) xp += productive;
   };
 
   async function loadPetStatus() {
@@ -49,6 +53,7 @@ chrome.runtime.onMessage.addListener(async function(message, sender, sendRespons
   }
 
   sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 // function newTab() {
     
 // }

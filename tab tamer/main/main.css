@@ -1,0 +1,119 @@
+.topleftpanel {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.currentpet {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.happiness {
+    display: flex;
+    align-items: center;
+}
+
+.level {
+    display: flex;
+    align-items: center;
+}
+
+.settings_icon {
+    width: 30px;
+    height: 30px;
+}
+
+.changepet_icon {
+    width: 30px;
+    height: 30px;
+}
+
+.coins {
+    display: flex;
+    align-items: center;
+}
+
+.coins_icon {
+    width: 30px;
+    height: 30px;
+}
+
+.start {
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    background-color: #d5dfe5;
+    padding: 20px;
+}
+
+.input-container, .time-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.time-input-container {
+    flex-direction: row; /* Set flex direction to row */
+}
+
+.time-input-row {
+    display: flex;
+    align-items: center;
+}
+
+label {
+    width: 80px;
+    color: #7f9172;
+}
+
+input {
+    margin: 5px;
+    padding: 8px;
+    width: 30px;
+    border: 1px solid #567568;
+}
+
+.time-separator {
+    margin: 1px;
+    padding: 1px;
+    width: 10px;
+}
+
+.time-input {
+    background-color: #c9b1bd;
+    color: #567568;
+}
+
+.time-separator {
+    font-size: 1.5em;
+    color: #567568;
+}
+
+.begin {
+    background: #567568;
+    color: white;
+    display: block;
+    height: 30px;
+    width: 100px;
+    border-radius: 20px;
+    margin: 20px auto;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    font-size: 10px;
+    border: none;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+
+.begin:hover {
+    background-color: white;
+    color: #567568;
+    border: 2px solid black;
+}

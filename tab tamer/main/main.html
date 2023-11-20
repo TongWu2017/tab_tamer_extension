@@ -9,3 +9,74 @@
         <button id="startSession">Start</button>
     </body>
 </html>
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Page</title>
+    <link href="main.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <div class="topleftpanel">
+        <a class="settingsbutton" id="settings" href="">
+            <img class="settings_icon" width="30px" height="30px" src="https://cdn-icons-png.flaticon.com/512/126/126472.png">
+        </a>
+        <a class="changepet" id="inventory" href="">
+            <img class="changepet_icon" width="30px" height="30px" src="https://icons.veryicon.com/png/o/miscellaneous/itsm-management/change-2.png">
+        </a>
+        <a class="coins">
+            <img class="changepet_icon" width="30px" height="30px" src="https://cdn-icons-png.flaticon.com/512/819/819122.png">
+            <h4><span id="coinamount">0</span></h4>
+        </a>
+    </div>
+
+    <div class="start">
+        <h1 class="title">TabTamer</h1>
+
+        <div class="currentpet">
+            <h3 class="petname">Pet Name</h3>
+            <img class="peticon" width="150px" src="https://static.thenounproject.com/png/11640-200.png">
+            <div class="happiness">
+                <img class="happyface" width="30" src="https://cdn-icons-png.flaticon.com/512/5372/5372211.png">
+                <progress id="happybar" max="100" value="0"></progress>
+            </div>
+            <div class="level">
+                <h4>Level: <span id="levelnumber">1</span></h4>
+                <progress id="levelbar" max="100" value="0"></progress>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <label for="period1">Number of periods:</label>
+            <input type="number" id="period1" name="period1">
+        </div>
+
+        <div class="time-input-container">
+            <label for="productivity">Productivity:</label>
+            <div class="time-input-row">
+                <input type="number" id="productivityHours" name="productivityHours" class="time-input">
+                <span class="time-separator">:</span>
+                <input type="number" id="productivityMinutes" name="productivityMinutes" class="time-input">
+            </div>
+        </div>
+
+        <div class="time-input-container">
+            <label for="rest">Rest:</label>
+            <div class="time-input-row">
+                <input type="number" id="restHours" name="restHours" class="time-input">
+                <span class="time-separator">:</span>
+                <input type="number" id="restMinutes" name="restMinutes" class="time-input">
+            </div>
+        </div>
+
+        <button class="begin" id="startsession">Start Studying!</button>
+    </div>
+
+</body>
+</html>

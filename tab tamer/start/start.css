@@ -1,0 +1,98 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #d5dfe5;
+    width: 250px;
+    height: 300px;
+}
+
+.home {
+    text-align: center;
+    margin: 50px;
+}
+
+.title {
+    color: #567568;
+}
+
+.rules-container {
+    background-color: #c9b1bd;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.rules-container h3 {
+    color: #333;
+}
+
+.rules-container ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.rules-container li {
+    margin-bottom: 5px;
+}
+
+.rules {
+    font-size: 1.2em;
+    color: #7f9172;
+}
+
+.rulelist {
+    list-style-type: none;
+    padding: 0;
+}
+
+.rule {
+    margin-bottom: 5px;
+}
+
+.choosepet {
+    background: #567568;
+    color: white;
+    display: block;
+    height: 30px;
+    width: 100px;
+    border-radius: 20px;
+    margin: 20px auto;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    font-size: 8px;
+    border: none;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.choosepet:hover {
+    background-color: white;
+    color: #567568;
+    border: 2px solid black;
+}
+
+
+.begin {
+    background: #567568;
+    color: white;
+    display: block;
+    height: 30px;
+    width: 100px;
+    border-radius: 20px;
+    margin: 20px auto;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    font-size: 8px;
+    border: none;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+
+.begin:hover {
+    background-color: white;
+    color: #567568;
+    border: 2px solid black;
+}
