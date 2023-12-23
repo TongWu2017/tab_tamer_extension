@@ -66,6 +66,7 @@ function addBadSite() {
 document.getElementById("settingsBack").addEventListener("click", gotoMain);
 
 function gotoMain() {
+    console.log("gotomain called")
 
     var contentDiv = document.getElementById('content');
     var pageUrl = chrome.runtime.getURL('main/main.html');
@@ -74,7 +75,7 @@ function gotoMain() {
         .then(response => response.text())
         .then(html => {
             contentDiv.innerHTML = html;
-            addPageScript("main/main.js");
+            addPageScript("./main/main.js");
         });
 
 }

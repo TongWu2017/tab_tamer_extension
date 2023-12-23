@@ -23,7 +23,6 @@
     "matches": [
       "http://*/*",
       "https://*/*"
-    ],
-    "run_at": "document_idle"
+    ]
   }]
 }

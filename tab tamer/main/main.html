@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
     <head>
         <title>TabTamer</title>
@@ -9,7 +9,7 @@
         <button id="startSession">Start</button>
     </body>
 </html>
-
+ -->
 
 
 
@@ -19,15 +19,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Start Page</title>
-    <link href="main.css" rel="stylesheet" type="text/css">
+    <link href="main/main.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
     <div class="topleftpanel">
-        <a class="settingsbutton" id="settings" href="">
+        <a class="settingsbutton" id="settings">
             <img class="settings_icon" width="30px" height="30px" src="https://cdn-icons-png.flaticon.com/512/126/126472.png">
         </a>
-        <a class="changepet" id="inventory" href="">
+        <a class="changepet" id="inventory">
             <img class="changepet_icon" width="30px" height="30px" src="https://icons.veryicon.com/png/o/miscellaneous/itsm-management/change-2.png">
         </a>
         <a class="coins">
@@ -44,7 +44,7 @@
             <img class="peticon" width="150px" src="https://static.thenounproject.com/png/11640-200.png">
             <div class="happiness">
                 <img class="happyface" width="30" src="https://cdn-icons-png.flaticon.com/512/5372/5372211.png">
-                <progress id="happybar" max="100" value="0"></progress>
+                <progress id="happybar" max="7200" value="0"></progress>
             </div>
             <div class="level">
                 <h4>Level: <span id="levelnumber">1</span></h4>
@@ -78,5 +78,6 @@
         <button class="begin" id="startsession">Start Studying!</button>
     </div>
 
+    <script src="main.js"></script>
 </body>
 </html>
