@@ -67,15 +67,12 @@ sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 // }
 
 chrome.tabs.onActivated.addListener(async function (tab) {
-    console.log("tab activated")
     const t = await chrome.tabs.get(tab.tabId);
     const domain = new URL(t.url).hostname;
 
     const obj = await chrome.storage.local.get();
 
     if(!obj.started) return
-    console.log(obj.productive[0])
-    console.log(obj.unproductive[0])
     console.log(domain)
     if (obj.productive.includes(domain)) {
         console.log("you are on a productive site")
