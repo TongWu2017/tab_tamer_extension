@@ -66,41 +66,41 @@ document.getElementById("inventory").addEventListener("click", gotoinventory);
 //     }
 // });
 
-function PeriodInput(element, maxDigits) {
-    periods = element.value.replace(/\D/g, ''); // Remove non-numeric characters
-    if (periods.length > maxDigits) {
-        element.value = periods.slice(0, maxDigits); // Truncate to the first maxDigits characters
-    }
-}
+// function PeriodInput(element, maxDigits) {
+//     periods = element.value.replace(/\D/g, ''); // Remove non-numeric characters
+//     if (periods.length > maxDigits) {
+//         element.value = periods.slice(0, maxDigits); // Truncate to the first maxDigits characters
+//     }
+// }
 
-function ProductiveHoursInput(element, maxDigits) {
-    productiveHours = element.value.replace(/\D/g, ''); // Remove non-numeric characters
-    if (productiveHours.length > maxDigits) {
-        element.value = productiveHours.slice(0, maxDigits); // Truncate to the first maxDigits characters
-    }
-}
+// function ProductiveHoursInput(element, maxDigits) {
+//     productiveHours = element.value.replace(/\D/g, ''); // Remove non-numeric characters
+//     if (productiveHours.length > maxDigits) {
+//         element.value = productiveHours.slice(0, maxDigits); // Truncate to the first maxDigits characters
+//     }
+// }
 
-function ProductiveMinutesInput(element, maxDigits) {
-    productiveMinutes = element.value.replace(/\D/g, ''); // Remove non-numeric characters
-    console.log("productiveMinutes: " + productiveMinutes + " maxDigits: " + maxDigits + " productiveMinutes.length: " + productiveMinutes.length + " productiveMinutes.length > maxDigits: " + productiveMinutes.length > maxDigits + " productiveMinutes.slice(0, maxDigits): " + productiveMinutes.slice(0, maxDigits) + " productiveMinutes.slice(0, maxDigits).length: " + productiveMinutes.slice(0, maxDigits).length);
-    if (productiveMinutes.length > maxDigits) {
-        element.value = productiveMinutes.slice(0, maxDigits); // Truncate to the first maxDigits characters
-    }
-}
+// function ProductiveMinutesInput(element, maxDigits) {
+//     productiveMinutes = element.value.replace(/\D/g, ''); // Remove non-numeric characters
+//     console.log("productiveMinutes: " + productiveMinutes + " maxDigits: " + maxDigits + " productiveMinutes.length: " + productiveMinutes.length + " productiveMinutes.length > maxDigits: " + productiveMinutes.length > maxDigits + " productiveMinutes.slice(0, maxDigits): " + productiveMinutes.slice(0, maxDigits) + " productiveMinutes.slice(0, maxDigits).length: " + productiveMinutes.slice(0, maxDigits).length);
+//     if (productiveMinutes.length > maxDigits) {
+//         element.value = productiveMinutes.slice(0, maxDigits); // Truncate to the first maxDigits characters
+//     }
+// }
 
-function RestHoursInput(element, maxDigits) {
-    restHours = element.value.replace(/\D/g, ''); // Remove non-numeric characters
-    if (restHours.length > maxDigits) {
-        element.value = restHours.slice(0, maxDigits); // Truncate to the first maxDigits characters
-    }
-}
+// function RestHoursInput(element, maxDigits) {
+//     restHours = element.value.replace(/\D/g, ''); // Remove non-numeric characters
+//     if (restHours.length > maxDigits) {
+//         element.value = restHours.slice(0, maxDigits); // Truncate to the first maxDigits characters
+//     }
+// }
 
-function RestMinutesInput(element, maxDigits) {
-    restMinutes = element.value.replace(/\D/g, ''); // Remove non-numeric characters
-    if (restMinutes.length > maxDigits) {
-        element.value = restMinutes.slice(0, maxDigits); // Truncate to the first maxDigits characters
-    }
-}
+// function RestMinutesInput(element, maxDigits) {
+//     restMinutes = element.value.replace(/\D/g, ''); // Remove non-numeric characters
+//     if (restMinutes.length > maxDigits) {
+//         element.value = restMinutes.slice(0, maxDigits); // Truncate to the first maxDigits characters
+//     }
+// }
 
 function StartStudying() {
     coin_element = document.getElementById("coinamount");
@@ -108,35 +108,31 @@ function StartStudying() {
     localStorage.setItem('coins', coins); // Update and store the 'coins' value
     coin_element.innerHTML = coins;
 
-    const periods = parseInt(document.getElementById("period1").value.replace(/\D/g, ''));
-    const productiveHours = parseInt(document.getElementById("productivityHours").value.replace(/\D/g, ''));
-    const productiveMinutes = parseInt(document.getElementById("productivityMinutes").value.replace(/\D/g, ''));
-    const restHours = parseInt(document.getElementById("restHours").value.replace(/\D/g, ''));
-    const restMinutes = parseInt(document.getElementById("restMinutes").value.replace(/\D/g, ''));
+    var periods = parseInt(document.getElementById("period1").value.replace(/\D/g, ''));
+    var productiveHours = parseInt(document.getElementById("productivityHours").value.replace(/\D/g, ''));
+    var productiveMinutes = parseInt(document.getElementById("productivityMinutes").value.replace(/\D/g, ''));
+    var restHours = parseInt(document.getElementById("restHours").value.replace(/\D/g, ''));
+    var restMinutes = parseInt(document.getElementById("restMinutes").value.replace(/\D/g, ''));
 
     if (isNaN(periods)) {
         alert("Please enter a valid number of periods");
         return;
     }
     if (isNaN(productiveHours)) {
-        alert("Please enter a valid number of productive hours");
-        return;
+        productiveHours = 0;
     }
     if (isNaN(productiveMinutes)) {
-        alert("Please enter a valid number of productive minutes");
-        return;
+        productiveMinutes = 0;
     }
     if (isNaN(restHours)) {
-        alert("Please enter a valid number of rest hours");
-        return;
+        restHours = 0;
     }
     if (isNaN(restMinutes)) {
-        alert("Please enter a valid number of rest minutes");
-        return;
+        restMinutes = 0;
     }
 
     chrome.action.setBadgeText( { text: "test" } );
-    chrome.runtime.sendMessage({ from: "tabtamerStart", tracking: true, productiveMinutes: 60 * productiveHours + productiveMinutes, restMinutes: 60 * restHours + restMinutes});
+    chrome.runtime.sendMessage({ from: "tabtamerStart", tracking: true, productiveMinutes: 60 * productiveHours + productiveMinutes, restMinutes: 60 * restHours + restMinutes, periods: periods});
     
     console.log("You have started studying!");
     

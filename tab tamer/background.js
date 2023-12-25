@@ -1,3 +1,4 @@
+
 //console.log('background running');
 var bghappiness = false;
 var bgxp = false;
@@ -8,23 +9,37 @@ var tracking = false;
 
 var petObj = {};
 
-var remainingMinutes = 0;
-var startTime = 0;
+var remainingMinutes = -1;
+var nextRemainingMinutes = -1;
+var startTime = -1;
+
+var productiveMinutes = -1;
+var restMinutes = -1;
+var periods = -1;
+var state = 'z'; //1 for productive, 0 for rest, x for unknown, z for not started
+var nextState = 'z';
 
 //TODO: async loop that replaces the loop method
 //the loop should update the pet status every second if tracking is true
 //the loop should also keep track of the productive cycle time and update the badge text to display remaining time
 setInterval(() => {
     if (tracking) {
-        const currentTime = Date.now();
-        //productiveMinutes is not initialized yet
-        //later the code will be edited so that the start session button will provide information for productiveMinutes
-        const nextRemainingMinutes = Math.floor((startTime + productiveMinutes * 60000 - currentTime) / 60000);
+        updateStateAndRemainingMinutes();
         if (nextRemainingMinutes != remainingMinutes) {
             chrome.action.setBadgeText({ text: nextRemainingMinutes.toString() });
             remainingMinutes = nextRemainingMinutes;
         }
-        updatePetStatus();        
+        if (nextState != state) {
+            if (nextState == 1) {
+                chrome.action.setBadgeBackgroundColor({ color: "#00FF00" });
+            } else if (nextState == 0) {
+                chrome.action.setBadgeBackgroundColor({ color: "#FF0000" });
+            } else {
+                chrome.action.setBadgeBackgroundColor({ color: "#000000" });
+            }
+            state = nextState;
+        }
+        updatePetStatus();
     }
 }, 1000);
 
@@ -37,7 +52,9 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
         console.log("startmsg")
         productiveMinutes = message.productiveMinutes;
         restMinutes = message.restMinutes;
+        periods = message.periods;
         tracking = message.tracking;
+
         startTime = Date.now();
         // if (tracking) {
         //     loop();
@@ -112,7 +129,7 @@ async function tabUpdate(tabId) {
 
     const obj = await chrome.storage.local.get();
 
-    if(!obj.started) return
+    if (!obj.started) return
     console.log(domain)
     if (obj.productive.includes(domain)) {
         console.log("you are on a productive site")
@@ -128,22 +145,49 @@ async function tabUpdate(tabId) {
 
 chrome.runtime.onMessage.addListener(function (message, sender, senderResponse) {
     if (message.type === "image") {
-      fetch('<https://api.tinify.com/shrink>', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${btoa('api:xxxxxx')}`,
-          'Content-Type': 'application/json'
-        },
-  
-        body: JSON.stringify({source: {url: message.url}})
-      }).then(res => {
-        return res.json();
-      }).then(res => {
-        senderResponse(res);
-      })
+        fetch('<https://api.tinify.com/shrink>', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${btoa('api:xxxxxx')}`,
+                'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify({ source: { url: message.url } })
+        }).then(res => {
+            return res.json();
+        }).then(res => {
+            senderResponse(res);
+        })
     }
     return true
-  });
+});
+
+const updateStateAndRemainingMinutes = () => {
+    const periodMinutes = productiveMinutes + restMinutes;
+    const timeSinceStart = (Date.now() - startTime);
+    const timeSincePeriodStart = timeSinceStart % (periodMinutes * 60000);
+    const periodsPassed = timeSinceStart / (periodMinutes * 60000);
+    console.log("time since start: " + timeSinceStart);
+    console.log("time since period start: " + timeSincePeriodStart);
+    console.log("periods passed: " + periodsPassed);
+    console.log("periods: " + periods);
+    console.log("periodsPassed >= periods: " + (periodsPassed >= periods)   );
+    if (periodsPassed >= periods) {
+        nextState = 'z';
+        console.log("nextState: " + nextState);
+        return;
+    }
+    if (timeSincePeriodStart < productiveMinutes * 60000) {
+        nextState = 1;
+        nextRemainingMinutes = Math.floor((productiveMinutes * 60000 - timeSincePeriodStart) / 60000);
+        console.log("nextState: " + nextState);
+        return;
+    }
+    nextState = 0;
+    nextRemainingMinutes = Math.floor((periodMinutes * 60000 - timeSincePeriodStart) / 60000);
+    console.log("nextState: " + nextState);
+
+}
 
 // chrome.tabs.onUpdated.addListener(function (tab, tab2, tab3) {
 //     console.log("tab updated")
