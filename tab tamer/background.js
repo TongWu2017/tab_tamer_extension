@@ -35,10 +35,13 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     // }
     if (message.from == "tabtamerStart") {
         console.log("startmsg")
+        productiveMinutes = message.productiveMinutes;
+        restMinutes = message.restMinutes;
         tracking = message.tracking;
-        if (tracking) {
-            loop();
-        }
+        startTime = Date.now();
+        // if (tracking) {
+        //     loop();
+        // }
     }
     if (message.from == "tabtamerRequestPetStatus") {
         if (!statusLoaded) {
@@ -61,12 +64,12 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     }
 });
 
-const loop = async () => {
-    while (tracking) {
-        updatePetStatus();
-        await sleep(1000);
-    }
-}
+// const loop = async () => {
+//     while (tracking) {
+//         updatePetStatus();
+//         await sleep(1000);
+//     }
+// }
 
 async function updatePetStatus() {
     if (!statusLoaded) {
