@@ -8,6 +8,27 @@ var tracking = false;
 
 var petObj = {};
 
+var remainingMinutes = 0;
+var startTime = 0;
+
+//TODO: async loop that replaces the loop method
+//the loop should update the pet status every second if tracking is true
+//the loop should also keep track of the productive cycle time and update the badge text to display remaining time
+setInterval(() => {
+    if (tracking) {
+        const currentTime = Date.now();
+        //productiveMinutes is not initialized yet
+        //later the code will be edited so that the start session button will provide information for productiveMinutes
+        const nextRemainingMinutes = Math.floor((startTime + productiveMinutes * 60000 - currentTime) / 60000);
+        if (nextRemainingMinutes != remainingMinutes) {
+            chrome.action.setBadgeText({ text: nextRemainingMinutes.toString() });
+            remainingMinutes = nextRemainingMinutes;
+        }
+        updatePetStatus();        
+    }
+}, 1000);
+
+
 chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
     // if (message.from == "tabtamerContentScript") {
     //     productive = message.productive;
