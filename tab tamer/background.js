@@ -30,6 +30,14 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
             petStatus: { happiness: bghappiness, xp: bgxp }
         })
     }
+    if (message.from == "resolveURL") {
+        const url = message.url.startsWith("http") ? message.url : "https://" + message.url;
+        fetch(url, { method: 'HEAD', redirect: 'follow' }).then(res => {
+            sendResponse(res.url);
+        }).catch(err => {
+            sendResponse(false);
+        })
+    }
 });
 
 const loop = async () => {
@@ -66,8 +74,16 @@ sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // }
 
-chrome.tabs.onActivated.addListener(async function (tab) {
-    const t = await chrome.tabs.get(tab.tabId);
+chrome.tabs.onActivated.addListener(tab => tabUpdate(tab.tabId));
+chrome.tabs.onUpdated.addListener((tabId) => tabUpdate(tabId));
+
+// chrome.tabs.onCreated.addListener(function (tab) {
+//     console.log("tab created")
+//     console.log(tab)
+
+
+async function tabUpdate(tabId) {
+    const t = await chrome.tabs.get(tabId);
     const domain = new URL(t.url).hostname;
 
     const obj = await chrome.storage.local.get();
@@ -84,14 +100,26 @@ chrome.tabs.onActivated.addListener(async function (tab) {
         console.log("you are on a neutral site")
         productive = 0;
     }
-});
+}// });
 
-// chrome.tabs.onCreated.addListener(function (tab) {
-//     console.log("tab created")
-//     console.log(tab)
-
-
-// });
+chrome.runtime.onMessage.addListener(function (message, sender, senderResponse) {
+    if (message.type === "image") {
+      fetch('<https://api.tinify.com/shrink>', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${btoa('api:xxxxxx')}`,
+          'Content-Type': 'application/json'
+        },
+  
+        body: JSON.stringify({source: {url: message.url}})
+      }).then(res => {
+        return res.json();
+      }).then(res => {
+        senderResponse(res);
+      })
+    }
+    return true
+  });
 
 // chrome.tabs.onUpdated.addListener(function (tab, tab2, tab3) {
 //     console.log("tab updated")
@@ -102,13 +130,13 @@ chrome.tabs.onActivated.addListener(async function (tab) {
 
 // });
 
-function activate(tab) {
+// function activate(tab) {
 
 //     console.log("activate is called")
 // console.log(tab.name)
 //     chrome.runtime.sendMessage({ from: "tabtamerBgTabChange" }).catch(console.error);
 
-}
+// }
 /*
 function handleUpdated(tabId, changeInfo, tabInfo) {
     console.log(`Updated tab: ${tabId}`);

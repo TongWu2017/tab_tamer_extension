@@ -101,7 +101,7 @@ function RestMinutesInput(element, maxDigits) {
 }
 
 function StartStudying() {
-    chrome.browserAction.setBadgeText ( { text: "test" } );
+    chrome.action.setBadgeText ( { text: "test" } );
     chrome.runtime.sendMessage({ from: "tabtamerStart", tracking: true });
 
     coin_element = document.getElementById("coinamount");

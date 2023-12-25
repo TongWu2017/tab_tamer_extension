@@ -5,27 +5,31 @@ trashButtonListener("unproductive");
 
 document.getElementById("addGoodSiteBtn").addEventListener("click", addGoodSite);
 
-function addGoodSite() {
+async function addGoodSite() {
     var domain = null;
-    try {
-        domain = (new URL(document.getElementById("siteToAddGood").value)).hostname;
-    } catch {
-        alert(document.getElementById("siteToAddGood").value + " is not a valid url")
-        return;
-    }
-
-
-    chrome.storage.local.get("productive").then(obj => {
-
-        var productiveArray = obj.productive
-        if (!productiveArray.includes(domain))
-            productiveArray.push(domain);
-        chrome.storage.local.set({ productive: productiveArray });
-        loadDivs("productive");
-
+    const inputURL = document.getElementById("siteToAddGood").value;
+    buttonLoading("addGoodSiteBtn", "Adding...");
+    chrome.runtime.sendMessage({ from: "resolveURL", url: inputURL }, response => {
+        if (!response) {
+            buttonLoaded("addGoodSiteBtn", "Invalid URL");
+            return;
+        }
+        console.log("response recieved");
+        console.log(response);
+        domain = (new URL(response)).hostname;
+        chrome.storage.local.get("productive").then(obj => {
+            var productiveArray = obj.productive
+            if (!productiveArray.includes(domain))
+                productiveArray.push(domain);
+            chrome.storage.local.set({ productive: productiveArray });
+            loadDivs("productive");
+            buttonLoaded("addGoodSiteBtn", "Add");
+    
+        })
     })
 
 }
+
 async function loadDivs(siteType) {
     var divList = (await chrome.storage.local.get(siteType));
     const ul = document.getElementById(siteType);
@@ -94,7 +98,7 @@ function trashButtonListener(siteType) {
             const domain = event.target.id;
             chrome.storage.local.get(siteType).then(async obj => {
 
-                var productiveArray = obj.productive
+                var productiveArray = obj[siteType];
                 if (productiveArray.includes(domain)) {
                     productiveArray = productiveArray.filter(item => item != domain);
 
@@ -110,4 +114,14 @@ function trashButtonListener(siteType) {
             })
         }
     })
+}
+
+function buttonLoading(buttonId, text) {
+    document.getElementById(buttonId).disabled = true;
+    document.getElementById(buttonId).textContent = text;
+}
+
+function buttonLoaded(buttonId, text) {
+    document.getElementById(buttonId).disabled = false;
+    document.getElementById(buttonId).textContent = text;
 }
