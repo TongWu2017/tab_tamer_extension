@@ -52,12 +52,12 @@
             </div>
         </div>
 
-        <div class="input-container">
+        <div id="period-input-div" class="input-container">
             <label for="period1">Number of periods:</label>
             <input type="number" id="period1" name="period1">
         </div>
 
-        <div class="time-input-container">
+        <div id="productivity-input-div" class="time-input-container">
             <label for="productivity">Productivity:</label>
             <div class="time-input-row">
                 <input type="number" id="productivityHours" name="productivityHours" class="time-input">
@@ -66,13 +66,28 @@
             </div>
         </div>
 
-        <div class="time-input-container">
+        <div id="rest-input-div" class="time-input-container">
             <label for="rest">Rest:</label>
             <div class="time-input-row">
                 <input type="number" id="restHours" name="restHours" class="time-input">
                 <span class="time-separator">:</span>
                 <input type="number" id="restMinutes" name="restMinutes" class="time-input">
             </div>
+        </div>
+
+        <div id="periods-remaining">
+            <label for="periods-remaining">Periods Remaining:</label>
+            <div id="periods-remaining-number"></div>
+        </div>
+
+        <div id="current-stage">
+            <label for="current-stage">Currently:</label>
+            <div id="current-stage-text"></div>
+        </div>
+
+        <div id="time-remaining">
+            <label for="time-remaining">Time Remaining:</label>
+            <div id="time-remaining-number"></div>
         </div>
 
         <button class="begin" id="startsession">Start Studying!</button>

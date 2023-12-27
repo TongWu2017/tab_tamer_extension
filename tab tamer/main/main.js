@@ -8,13 +8,35 @@ coins = parseInt(localStorage.getItem('coins')) || 0;
 happiness = 0;
 xp = 0;
 level = 1;
+currentState = "x";
+currentRemainingMinutes = -1;
 
-chrome.runtime.sendMessage({ from: "tabtamerRequestPetStatus" })
+requestData();
+setInterval(requestData, 1000);
 
-chrome.runtime.onMessage.addListener(message => {
+function requestData() {
+    chrome.runtime.sendMessage({ from: "tabtamerRequestState", currentState: currentState});
+    chrome.runtime.sendMessage({ from: "tabtamerRequestTime", currentRemainingMinutes: currentRemainingMinutes });    
+}
+
+chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
     if (message.from == "tabtamerBackground") {
         console.log(message);
         document.getElementById("happybar").value = message.petStatus.happiness;
+    }
+    if (message.from == "tabtamerBackgroundState") {
+        currentStatus = message.state;
+        if (message.state == "z") {
+            notSessionDisplay();
+        } else {
+            document.getElementById("current-stage-text").innerHTML = message.state ? "Productive" : "Rest";
+            sessionDisplay();
+        }
+    }
+
+    if (message.from == "tabtamerBackgroundRemaining") {
+        currentRemainingMinutes = message.remainingMinutes;
+        document.getElementById("time-remaining-number").innerHTML = message.remainingMinutes;
     }
 })
 
@@ -133,9 +155,27 @@ function StartStudying() {
 
     chrome.action.setBadgeText( { text: "test" } );
     chrome.runtime.sendMessage({ from: "tabtamerStart", tracking: true, productiveMinutes: 60 * productiveHours + productiveMinutes, restMinutes: 60 * restHours + restMinutes, periods: periods});
-    
     console.log("You have started studying!");
     
+}
+
+function sessionDisplay() {
+    document.getElementById("periods-remaining").style.display = "";
+    document.getElementById("current-stage").style.display = "";
+    document.getElementById("time-remaining").style.display = "";
+    document.getElementById("period-input-div").style.display = "none";
+    document.getElementById("productivity-input-div").style.display = "none";
+    document.getElementById("rest-input-div").style.display = "none";
+}
+
+function notSessionDisplay() {
+    document.getElementById("periods-remaining").style.display = "none";
+    document.getElementById("current-stage").style.display = "none";
+    document.getElementById("time-remaining").style.display = "none";
+
+    document.getElementById("period-input-div").style.display = "";
+    document.getElementById("productivity-input-div").style.display = "";
+    document.getElementById("rest-input-div").style.display = "";
 }
 
 function gotoSettings() {

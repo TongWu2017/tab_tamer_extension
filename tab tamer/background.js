@@ -24,22 +24,25 @@ var nextState = 'z';
 //the loop should also keep track of the productive cycle time and update the badge text to display remaining time
 setInterval(() => {
     if (tracking) {
+        updatePetStatus();
         updateStateAndRemainingMinutes();
-        if (nextRemainingMinutes != remainingMinutes) {
+        if (nextState != "z" || nextRemainingMinutes != remainingMinutes) {
             chrome.action.setBadgeText({ text: nextRemainingMinutes.toString() });
+            //chrome.runtime.sendMessage({ from: "tabtamerBackgroundRemaining", remainingMinutes: nextRemainingMinutes });
             remainingMinutes = nextRemainingMinutes;
         }
         if (nextState != state) {
+            //chrome.runtime.sendMessage({ from: "tabtamerBackgroundState", state: nextState });
             if (nextState == 1) {
                 chrome.action.setBadgeBackgroundColor({ color: "#00FF00" });
             } else if (nextState == 0) {
                 chrome.action.setBadgeBackgroundColor({ color: "#FF0000" });
             } else {
-                chrome.action.setBadgeBackgroundColor({ color: "#000000" });
+                chrome.action.setBadgeText({ text: null });
             }
             state = nextState;
         }
-        updatePetStatus();
+
     }
 }, 1000);
 
@@ -78,6 +81,16 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
         }).catch(err => {
             sendResponse(false);
         })
+    }
+    if (message.from == "tabtamerRequestTime") {
+        if (nextRemainingMinutes != message.currentRemainingMinutes) {
+            chrome.runtime.sendMessage({ from: "tabtamerBackgroundRemaining", remainingMinutes: nextRemainingMinutes });
+        }
+    }
+    if (message.from == "tabtamerRequestState") {
+        if (nextState != message.currentState) {
+            chrome.runtime.sendMessage({ from: "tabtamerBackgroundState", state: nextState });
+        }
     }
 });
 
@@ -125,42 +138,47 @@ chrome.tabs.onUpdated.addListener((tabId) => tabUpdate(tabId));
 
 async function tabUpdate(tabId) {
     const t = await chrome.tabs.get(tabId);
-    const domain = new URL(t.url).hostname;
+    try {
+        const domain = new URL(t.url).hostname;
 
-    const obj = await chrome.storage.local.get();
+        const obj = await chrome.storage.local.get();
 
-    if (!obj.started) return
-    console.log(domain)
-    if (obj.productive.includes(domain)) {
-        console.log("you are on a productive site")
-        productive = 1;
-    } else if (obj.unproductive.includes(domain)) {
-        console.log("you are on an unproductive site")
-        productive = -1;
-    } else {
-        console.log("you are on a neutral site")
+        if (!obj.started) return
+        console.log(domain)
+        if (obj.productive.includes(domain)) {
+            console.log("you are on a productive site")
+            productive = 1;
+        } else if (obj.unproductive.includes(domain)) {
+            console.log("you are on an unproductive site")
+            productive = -1;
+        } else {
+            console.log("you are on a neutral site")
+            productive = 0;
+        }
+    } catch {
+        console.log("you are on a site without a domain")
         productive = 0;
     }
 }// });
 
-chrome.runtime.onMessage.addListener(function (message, sender, senderResponse) {
-    if (message.type === "image") {
-        fetch('<https://api.tinify.com/shrink>', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Basic ${btoa('api:xxxxxx')}`,
-                'Content-Type': 'application/json'
-            },
+// chrome.runtime.onMessage.addListener(function (message, sender, senderResponse) {
+//     if (message.type === "image") {
+//         fetch('<https://api.tinify.com/shrink>', {
+//             method: 'POST',
+//             headers: {
+//                 'Authorization': `Basic ${btoa('api:xxxxxx')}`,
+//                 'Content-Type': 'application/json'
+//             },
 
-            body: JSON.stringify({ source: { url: message.url } })
-        }).then(res => {
-            return res.json();
-        }).then(res => {
-            senderResponse(res);
-        })
-    }
-    return true
-});
+//             body: JSON.stringify({ source: { url: message.url } })
+//         }).then(res => {
+//             return res.json();
+//         }).then(res => {
+//             senderResponse(res);
+//         })
+//     }
+//     return true
+// });
 
 const updateStateAndRemainingMinutes = () => {
     const periodMinutes = productiveMinutes + restMinutes;
@@ -171,7 +189,7 @@ const updateStateAndRemainingMinutes = () => {
     console.log("time since period start: " + timeSincePeriodStart);
     console.log("periods passed: " + periodsPassed);
     console.log("periods: " + periods);
-    console.log("periodsPassed >= periods: " + (periodsPassed >= periods)   );
+    console.log("periodsPassed >= periods: " + (periodsPassed >= periods));
     if (periodsPassed >= periods) {
         nextState = 'z';
         console.log("nextState: " + nextState);
