@@ -11,9 +11,16 @@ level = 1;
 currentState = "x";
 currentRemainingMinutes = -1;
 
+loadMain();
 
-requestData();
 setInterval(requestData, 1000);
+
+function loadMain() {
+    document.getElementById("startsession").addEventListener("click", StartStudying);
+    document.getElementById("settings").addEventListener("click", gotoSettings);
+    document.getElementById("inventory").addEventListener("click", gotoinventory);
+    requestData();
+}
 
 function requestData() {
     console.log("reqdata called")
@@ -45,12 +52,8 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
 
 
 
-document.addEventListener('DOMContentLoaded', function () {
 
-})
-document.getElementById("startsession").addEventListener("click", StartStudying);
-document.getElementById("settings").addEventListener("click", gotoSettings);
-document.getElementById("inventory").addEventListener("click", gotoinventory);
+
 
 // document.addEventListener("DOMContentLoaded", function () {
 //     var periodInput = document.getElementById("period");
@@ -195,6 +198,11 @@ function gotoSettings() {
             contentDiv.innerHTML = html;
             console.log("settings clicked");
             addPageScript("settings/settings.js");
+            try {
+                loadSettings();
+            } catch {
+                
+            }
         });
 
 }

@@ -1,10 +1,17 @@
-loadDivs("productive");
-loadDivs("unproductive");
-trashButtonListener("productive");
-trashButtonListener("unproductive");
+loadSettings();
+function loadSettings() {
 
-document.getElementById("addGoodSiteBtn").addEventListener("click", addGoodSite);
+    loadDivs("productive");
+    loadDivs("unproductive");
+    trashButtonListener("productive");
+    trashButtonListener("unproductive");
 
+    document.getElementById("addGoodSiteBtn").addEventListener("click", addGoodSite);
+    document.getElementById("addBadSiteBtn").addEventListener("click", addBadSite);
+
+    document.getElementById("settingsBack").addEventListener("click", gotoMain);
+
+}
 async function addGoodSite() {
     var domain = null;
     const inputURL = document.getElementById("siteToAddGood").value;
@@ -46,7 +53,6 @@ async function loadDivs(siteType) {
     });
 
 }
-document.getElementById("addBadSiteBtn").addEventListener("click", addBadSite);
 
 function addBadSite() {
     var domain = null;
@@ -67,7 +73,6 @@ function addBadSite() {
     })
 
 }
-document.getElementById("settingsBack").addEventListener("click", gotoMain);
 
 function gotoMain() {
     console.log("gotomain called")
@@ -80,6 +85,10 @@ function gotoMain() {
         .then(html => {
             contentDiv.innerHTML = html;
             addPageScript("./main/main.js");
+            requestData();
+            document.getElementById("startsession").addEventListener("click", StartStudying);
+            document.getElementById("settings").addEventListener("click", gotoSettings);
+            document.getElementById("inventory").addEventListener("click", gotoinventory);
         });
 
 }
