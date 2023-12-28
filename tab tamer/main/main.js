@@ -11,25 +11,28 @@ level = 1;
 currentState = "x";
 currentRemainingMinutes = -1;
 
+
 requestData();
 setInterval(requestData, 1000);
 
 function requestData() {
-    chrome.runtime.sendMessage({ from: "tabtamerRequestState", currentState: currentState});
-    chrome.runtime.sendMessage({ from: "tabtamerRequestTime", currentRemainingMinutes: currentRemainingMinutes });    
+    console.log("reqdata called")
+    chrome.runtime.sendMessage({ from: "tabtamerRequestPetStatus" })
+    chrome.runtime.sendMessage({ from: "tabtamerRequestState", currentState: currentState });
+    chrome.runtime.sendMessage({ from: "tabtamerRequestTime", currentRemainingMinutes: currentRemainingMinutes });
 }
 
 chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
     if (message.from == "tabtamerBackground") {
         console.log(message);
-        document.getElementById("happybar").value = message.petStatus.happiness;
+        updateHTMLAttribute("happybar", "value", message.petStatus.happiness);
     }
     if (message.from == "tabtamerBackgroundState") {
         currentStatus = message.state;
         if (message.state == "z") {
             notSessionDisplay();
         } else {
-            document.getElementById("current-stage-text").innerHTML = message.state ? "Productive" : "Rest";
+            updateHTMLAttribute("current-stage-text", "innerHTML", message.state ? "Productive" : "Rest");
             sessionDisplay();
         }
     }
@@ -153,29 +156,33 @@ function StartStudying() {
         restMinutes = 0;
     }
 
-    chrome.action.setBadgeText( { text: "test" } );
-    chrome.runtime.sendMessage({ from: "tabtamerStart", tracking: true, productiveMinutes: 60 * productiveHours + productiveMinutes, restMinutes: 60 * restHours + restMinutes, periods: periods});
+    chrome.action.setBadgeText({ text: "test" });
+    chrome.runtime.sendMessage({ from: "tabtamerStart", tracking: true, productiveMinutes: 60 * productiveHours + productiveMinutes, restMinutes: 60 * restHours + restMinutes, periods: periods });
     console.log("You have started studying!");
-    
+
 }
 
 function sessionDisplay() {
-    document.getElementById("periods-remaining").style.display = "";
-    document.getElementById("current-stage").style.display = "";
-    document.getElementById("time-remaining").style.display = "";
-    document.getElementById("period-input-div").style.display = "none";
-    document.getElementById("productivity-input-div").style.display = "none";
-    document.getElementById("rest-input-div").style.display = "none";
+    try {
+        document.getElementById("periods-remaining").style.display = "";
+        document.getElementById("current-stage").style.display = "";
+        document.getElementById("time-remaining").style.display = "";
+        document.getElementById("period-input-div").style.display = "none";
+        document.getElementById("productivity-input-div").style.display = "none";
+        document.getElementById("rest-input-div").style.display = "none";
+    } catch { }
 }
 
 function notSessionDisplay() {
-    document.getElementById("periods-remaining").style.display = "none";
-    document.getElementById("current-stage").style.display = "none";
-    document.getElementById("time-remaining").style.display = "none";
+    try {
+        document.getElementById("periods-remaining").style.display = "none";
+        document.getElementById("current-stage").style.display = "none";
+        document.getElementById("time-remaining").style.display = "none";
 
-    document.getElementById("period-input-div").style.display = "";
-    document.getElementById("productivity-input-div").style.display = "";
-    document.getElementById("rest-input-div").style.display = "";
+        document.getElementById("period-input-div").style.display = "";
+        document.getElementById("productivity-input-div").style.display = "";
+        document.getElementById("rest-input-div").style.display = "";
+    } catch { }
 }
 
 function gotoSettings() {
@@ -202,8 +209,6 @@ function gotoinventory() {
         .then(html => {
             contentDiv.innerHTML = html;
             addPageScript("inventory/inventory.js");
-            loadDivs("productive");
-            loadDivs("unproductive");
         });
 
 }
@@ -222,5 +227,11 @@ async function loadDivs(siteType) {
         div.appendChild(bu);
         ul.appendChild(div);
     });
+}
 
+function updateHTMLAttribute(id, attribute, value) {
+    if (document.getElementById(id) == null) {
+        return;
+    }
+    document.getElementById(id)[attribute] = value;
 }

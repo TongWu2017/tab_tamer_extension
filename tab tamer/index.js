@@ -6,13 +6,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     .then(response => response.text()).catch(console.error)
     .then(html => {
       contentDiv.innerHTML = html;
-      addPageScript(`${start}/${start}.js`);
+      addPageScript(`./${start}/${start}.js`);
     });
 });
 
+// function addPageScript(scriptName) {
+//   var script = document.createElement(`script`);
+//   script.src = scriptName;
+//   document.head.appendChild(script);
+// }
+
 function addPageScript(scriptName) {
+  if (document.getElementById("loaded-script-" + scriptName)) {
+    return;
+  }
+  console.log(document.getElementById("loaded-script-" + scriptName)  + " is null")
   var script = document.createElement(`script`);
   script.src = scriptName;
+  script.id = "loaded-script-" + scriptName;
   document.head.appendChild(script);
 }
-
