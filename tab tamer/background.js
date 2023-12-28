@@ -19,6 +19,8 @@ var periods = -1;
 var state = 'z'; //1 for productive, 0 for rest, x for unknown, z for not started
 var nextState = 'z';
 
+var currentDomain = false;
+
 //TODO: async loop that replaces the loop method
 //the loop should update the pet status every second if tracking is true
 //the loop should also keep track of the productive cycle time and update the badge text to display remaining time
@@ -93,6 +95,12 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
             chrome.runtime.sendMessage({ from: "tabtamerBackgroundState", state: nextState });
         }
     }
+    if (message.from == "tabtamerSiteType") {
+        chrome.runtime.sendMessage({ from: "tabtamerBackgroundSiteType", domain: currentDomain });
+    }
+    if (message.from == "tabtamerTabUpdate") {
+        tabUpdate(-1);
+    }
 });
 
 // const loop = async () => {
@@ -138,19 +146,27 @@ chrome.tabs.onUpdated.addListener((tabId) => tabUpdate(tabId));
 
 
 async function tabUpdate(tabId) {
-    const t = await chrome.tabs.get(tabId);
+    var t;
+    if (tabId == -1) {
+        t = (await chrome.tabs.query({ active: true, currentWindow: true}))[0];
+    } else {
+        t = await chrome.tabs.get(tabId);
+    }
+    console.log("tab updated")
+    console.log(t)
     try {
         const domain = new URL(t.url).hostname;
+        currentDomain = domain;
 
         const obj = await chrome.storage.local.get();
 
         if (!obj.started) return
         console.log(domain)
-        if (obj.productive.includes(domain)) {
+        if (obj.productive[domain]) {
             //green
             updateIcon("#00FF00");
             productive = 1;
-        } else if (obj.unproductive.includes(domain)) {
+        } else if (obj.productive[domain] == false) {
             //yellow
             updateIcon("#FFFF00");
             productive = -1;
@@ -163,6 +179,7 @@ async function tabUpdate(tabId) {
         //grey
         updateIcon("#808080");
         productive = 0;
+        currentDomain = false;
     }
 }// });
 

@@ -20,6 +20,7 @@ function loadMain() {
     document.getElementById("settings").addEventListener("click", gotoSettings);
     document.getElementById("inventory").addEventListener("click", gotoinventory);
     requestData();
+    chrome.runtime.sendMessage({ from: "tabtamerSiteType" });
 }
 
 function requestData() {
@@ -51,6 +52,36 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
         const x1 = updateHTMLAttribute("time-remaining-number", "innerHTML", message.remainingMinutes);
         if (!x1) return;
         currentRemainingMinutes = message.remainingMinutes;
+    }
+
+    if (message.from == "tabtamerBackgroundSiteType") {
+        const domain = message.domain;
+        if (!domain) return;
+        console.log("domain: " + domain);
+        const makeProductiveButton = document.createElement("a");
+        makeProductiveButton.id = "make-productive-button";
+        makeProductiveButton.text = "Mark Site Productive";
+        document.getElementById("toprightpanel").appendChild(makeProductiveButton);
+
+        const makeUnproductiveButton = document.createElement("a");
+        makeUnproductiveButton.id = "make-unproductive-button";
+        makeUnproductiveButton.text = "Make Site Unproductive";
+        document.getElementById("toprightpanel").appendChild(makeUnproductiveButton);
+
+        makeProductiveButton.addEventListener("click", async function () {
+            alert(domain + " marked as productive");
+            const productiveObj = (await chrome.storage.local.get("productive")).productive;
+            productiveObj[domain] = true;
+            await chrome.storage.local.set({ productive: productiveObj });
+            chrome.runtime.sendMessage({ from: "tabtamerTabUpdate" });
+        })
+        makeUnproductiveButton.addEventListener("click", async function () {
+            alert(domain + " marked as unproductive");
+            const productiveObj = (await chrome.storage.local.get("productive")).productive;
+            productiveObj[domain] = false;
+            await chrome.storage.local.set({ productive: productiveObj });
+            chrome.runtime.sendMessage({ from: "tabtamerTabUpdate" });
+        })
     }
 })
 
@@ -183,7 +214,7 @@ function sessionDisplay() {
         return true;
     } catch {
         return false;
-     }
+    }
 }
 
 function notSessionDisplay() {
@@ -200,7 +231,7 @@ function notSessionDisplay() {
         return true;
     } catch {
         return false;
-     }
+    }
 }
 
 function gotoSettings() {
@@ -236,18 +267,21 @@ function gotoinventory() {
 }
 
 async function loadDivs(siteType) {
-    var divList = (await chrome.storage.local.get(siteType));
+    var productiveObj = (await chrome.storage.local.get("productive")).productive;
     const ul = document.getElementById(siteType);
+    const targetBoolean = (siteType == "productive");
     ul.innerHTML = "";
-    divList[siteType].forEach(element => {
-        var div = document.createElement("div");
-        div.id = element;
-        div.textContent = element;
-        var bu = document.createElement("button");
-        bu.id = element;
-        bu.textContent = "trash";
-        div.appendChild(bu);
-        ul.appendChild(div);
+    Object.keys(productiveObj).forEach(element => {
+        if (productiveObj[element] == targetBoolean) {
+            var div = document.createElement("div");
+            div.id = element;
+            div.textContent = element;
+            var bu = document.createElement("button");
+            bu.id = element;
+            bu.textContent = "trash";
+            div.appendChild(bu);
+            ul.appendChild(div);
+        }
     });
 }
 

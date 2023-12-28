@@ -1,21 +1,6 @@
 loadSettings();
 
-async function loadDivs(siteType) {
-    var divList = (await chrome.storage.local.get(siteType));
-    const ul = document.getElementById(siteType);
-    ul.innerHTML = "";
-    divList[siteType].forEach(element => {
-        var div = document.createElement("div");
-        div.id = element;
-        div.textContent = element;
-        var bu = document.createElement("button");
-        bu.id = element;
-        bu.textContent = "trash";
-        div.appendChild(bu);
-        ul.appendChild(div);
-    });
 
-}
 
 function addGoodSite() {
     const inputURL = document.getElementById("siteToAddGood").value;
@@ -41,10 +26,7 @@ function gotoMain() {
         .then(html => {
             contentDiv.innerHTML = html;
             addPageScript("./main/main.js");
-            requestData();
-            document.getElementById("startsession").addEventListener("click", StartStudying);
-            document.getElementById("settings").addEventListener("click", gotoSettings);
-            document.getElementById("inventory").addEventListener("click", gotoinventory);
+            loadMain();
         });
 
 }
@@ -61,21 +43,18 @@ function trashButtonListener(siteType) {
 
         if (event.target.nodeName == "BUTTON") {
             const domain = event.target.id;
-            chrome.storage.local.get(siteType).then(async obj => {
+            chrome.storage.local.get("productive").then(async obj => {
 
-                var productiveArray = obj[siteType];
-                if (productiveArray.includes(domain)) {
-                    productiveArray = productiveArray.filter(item => item != domain);
+                // var productiveArray = obj[siteType];
+                // if (productiveArray.includes(domain)) {
+                //     productiveArray = productiveArray.filter(item => item != domain);
 
-                }
-                if (siteType == "productive") {
-                    await chrome.storage.local.set({ productive: productiveArray });
-
-                } else {
-                    await chrome.storage.local.set({ unproductive: productiveArray });
-
-                }
-                loadDivs(siteType);
+                // }
+                const productiveObj = obj.productive;
+                delete productiveObj[domain];
+                await chrome.storage.local.set({ productive: productiveObj });
+                loadDivs("productive");
+                loadDivs("unproductive");
             })
         }
     })
@@ -103,16 +82,12 @@ chrome.runtime.onMessage.addListener(message => {
         // console.log("response recieved");
         // console.log(response);
         const domain = (new URL(message.url)).hostname;
-        chrome.storage.local.get(message.siteType).then(obj => {
-            var productiveArray = obj[message.siteType]
-            if (!productiveArray.includes(domain))
-                productiveArray.push(domain);
-            if (message.siteType == "productive") {
-                chrome.storage.local.set({ productive: productiveArray });
-            } else {
-                chrome.storage.local.set({ unproductive: productiveArray });
-            }
-            loadDivs(message.siteType);
+        chrome.storage.local.get("productive").then(obj => {
+            const productiveObj = obj.productive
+            productiveObj[domain] = message.siteType == "productive" ? true : false;
+            chrome.storage.local.set({ productive: productiveObj });
+            loadDivs("productive");
+            loadDivs("unproductive");
             buttonLoaded(buttonId, "Add");
         })
     }
