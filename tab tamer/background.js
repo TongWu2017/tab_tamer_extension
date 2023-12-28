@@ -67,7 +67,7 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
         if (!statusLoaded) {
             await loadPetStatus();
         }
-        console.log("req stat");
+        // console.log("req stat");
         chrome.runtime.sendMessage({
             from: "tabtamerBackground",
             petName: message.petName,
@@ -77,9 +77,10 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
     if (message.from == "resolveURL") {
         const url = message.url.startsWith("http") ? message.url : "https://" + message.url;
         fetch(url, { method: 'HEAD', redirect: 'follow' }).then(res => {
-            sendResponse(res.url);
+            chrome.runtime.sendMessage({ from: "tabtamerBackgroundURLresolved", url: res.url, siteType: message.siteType });
         }).catch(err => {
-            sendResponse(false);
+            console.log(err);
+            chrome.runtime.sendMessage({ from: "tabtamerBackgroundURLresolved", url: false, siteType: message.siteType });
         })
     }
     if (message.from == "tabtamerRequestTime") {
@@ -146,17 +147,21 @@ async function tabUpdate(tabId) {
         if (!obj.started) return
         console.log(domain)
         if (obj.productive.includes(domain)) {
-            console.log("you are on a productive site")
+            //green
+            updateIcon("#00FF00");
             productive = 1;
         } else if (obj.unproductive.includes(domain)) {
-            console.log("you are on an unproductive site")
+            //yellow
+            updateIcon("#FFFF00");
             productive = -1;
         } else {
-            console.log("you are on a neutral site")
+            //grey
+            updateIcon("#808080");
             productive = 0;
         }
     } catch {
-        console.log("you are on a site without a domain")
+        //grey
+        updateIcon("#808080");
         productive = 0;
     }
 }// });
@@ -185,20 +190,20 @@ const updateStateAndRemainingMinutes = () => {
     const timeSinceStart = (Date.now() - startTime);
     const timeSincePeriodStart = timeSinceStart % (periodMinutes * 60000);
     const periodsPassed = timeSinceStart / (periodMinutes * 60000);
-    console.log("time since start: " + timeSinceStart);
-    console.log("time since period start: " + timeSincePeriodStart);
-    console.log("periods passed: " + periodsPassed);
-    console.log("periods: " + periods);
-    console.log("periodsPassed >= periods: " + (periodsPassed >= periods));
+    // console.log("time since start: " + timeSinceStart);
+    // console.log("time since period start: " + timeSincePeriodStart);
+    // console.log("periods passed: " + periodsPassed);
+    // console.log("periods: " + periods);
+    // console.log("periodsPassed >= periods: " + (periodsPassed >= periods));
     if (periodsPassed >= periods) {
         nextState = 'z';
-        console.log("nextState: " + nextState);
+        // console.log("nextState: " + nextState);
         return;
     }
     if (timeSincePeriodStart < productiveMinutes * 60000) {
         nextState = 1;
         nextRemainingMinutes = Math.floor((productiveMinutes * 60000 - timeSincePeriodStart) / 60000);
-        console.log("nextState: " + nextState);
+        // console.log("nextState: " + nextState);
         return;
     }
     nextState = 0;
@@ -207,6 +212,15 @@ const updateStateAndRemainingMinutes = () => {
 
 }
 
+function updateIcon(colour) {
+    const canvas = new OffscreenCanvas(16, 16);
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, 16, 16);
+    context.fillStyle = colour;  // Green
+    context.fillRect(0, 0, 16, 16);
+    const imageData = context.getImageData(0, 0, 16, 16);
+    chrome.action.setIcon({ imageData: imageData }, () => { /* ... */ });
+}
 // chrome.tabs.onUpdated.addListener(function (tab, tab2, tab3) {
 //     console.log("tab updated")
 //     console.log(tab)

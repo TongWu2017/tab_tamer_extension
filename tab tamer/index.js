@@ -20,7 +20,6 @@ function addPageScript(scriptName) {
   if (document.getElementById("loaded-script-" + scriptName)) {
     return;
   }
-  console.log(document.getElementById("loaded-script-" + scriptName)  + " is null")
   var script = document.createElement(`script`);
   script.src = scriptName;
   script.id = "loaded-script-" + scriptName;

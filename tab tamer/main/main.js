@@ -23,7 +23,7 @@ function loadMain() {
 }
 
 function requestData() {
-    console.log("reqdata called")
+    // console.log("reqdata called")
     chrome.runtime.sendMessage({ from: "tabtamerRequestPetStatus" })
     chrome.runtime.sendMessage({ from: "tabtamerRequestState", currentState: currentState });
     chrome.runtime.sendMessage({ from: "tabtamerRequestTime", currentRemainingMinutes: currentRemainingMinutes });
@@ -31,22 +31,26 @@ function requestData() {
 
 chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
     if (message.from == "tabtamerBackground") {
-        console.log(message);
+        // console.log(message);
         updateHTMLAttribute("happybar", "value", message.petStatus.happiness);
     }
     if (message.from == "tabtamerBackgroundState") {
-        currentStatus = message.state;
         if (message.state == "z") {
-            notSessionDisplay();
+            const x1 = notSessionDisplay();
+            if (!x1) return;
         } else {
-            updateHTMLAttribute("current-stage-text", "innerHTML", message.state ? "Productive" : "Rest");
-            sessionDisplay();
+            const x1 = updateHTMLAttribute("current-stage-text", "innerHTML", message.state ? "Productive" : "Rest");
+            const x2 = sessionDisplay();
+            if (!(x1 && x2)) return;
         }
+        currentStatus = message.state;
+
     }
 
     if (message.from == "tabtamerBackgroundRemaining") {
+        const x1 = updateHTMLAttribute("time-remaining-number", "innerHTML", message.remainingMinutes);
+        if (!x1) return;
         currentRemainingMinutes = message.remainingMinutes;
-        document.getElementById("time-remaining-number").innerHTML = message.remainingMinutes;
     }
 })
 
@@ -167,25 +171,36 @@ function StartStudying() {
 
 function sessionDisplay() {
     try {
+        document.getElementById("stopsession").style.display = "";
         document.getElementById("periods-remaining").style.display = "";
         document.getElementById("current-stage").style.display = "";
         document.getElementById("time-remaining").style.display = "";
+
+        document.getElementById("startsession").style.display = "none";
         document.getElementById("period-input-div").style.display = "none";
         document.getElementById("productivity-input-div").style.display = "none";
         document.getElementById("rest-input-div").style.display = "none";
-    } catch { }
+        return true;
+    } catch {
+        return false;
+     }
 }
 
 function notSessionDisplay() {
     try {
+        document.getElementById("stopsession").style.display = "none";
         document.getElementById("periods-remaining").style.display = "none";
         document.getElementById("current-stage").style.display = "none";
         document.getElementById("time-remaining").style.display = "none";
 
+        document.getElementById("startsession").style.display = "";
         document.getElementById("period-input-div").style.display = "";
         document.getElementById("productivity-input-div").style.display = "";
         document.getElementById("rest-input-div").style.display = "";
-    } catch { }
+        return true;
+    } catch {
+        return false;
+     }
 }
 
 function gotoSettings() {
@@ -201,7 +216,6 @@ function gotoSettings() {
             try {
                 loadSettings();
             } catch {
-                
             }
         });
 
@@ -239,7 +253,22 @@ async function loadDivs(siteType) {
 
 function updateHTMLAttribute(id, attribute, value) {
     if (document.getElementById(id) == null) {
-        return;
+        return false;
     }
     document.getElementById(id)[attribute] = value;
+    return true;
+}
+
+function loadSettings() {
+
+    loadDivs("productive");
+    loadDivs("unproductive");
+    trashButtonListener("productive");
+    trashButtonListener("unproductive");
+
+    document.getElementById("addGoodSiteBtn").addEventListener("click", addGoodSite);
+    document.getElementById("addBadSiteBtn").addEventListener("click", addBadSite);
+
+    document.getElementById("settingsBack").addEventListener("click", gotoMain);
+
 }

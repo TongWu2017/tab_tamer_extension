@@ -1,41 +1,4 @@
 loadSettings();
-function loadSettings() {
-
-    loadDivs("productive");
-    loadDivs("unproductive");
-    trashButtonListener("productive");
-    trashButtonListener("unproductive");
-
-    document.getElementById("addGoodSiteBtn").addEventListener("click", addGoodSite);
-    document.getElementById("addBadSiteBtn").addEventListener("click", addBadSite);
-
-    document.getElementById("settingsBack").addEventListener("click", gotoMain);
-
-}
-async function addGoodSite() {
-    var domain = null;
-    const inputURL = document.getElementById("siteToAddGood").value;
-    buttonLoading("addGoodSiteBtn", "Adding...");
-    chrome.runtime.sendMessage({ from: "resolveURL", url: inputURL }, response => {
-        if (!response) {
-            buttonLoaded("addGoodSiteBtn", "Invalid URL");
-            return;
-        }
-        console.log("response recieved");
-        console.log(response);
-        domain = (new URL(response)).hostname;
-        chrome.storage.local.get("productive").then(obj => {
-            var productiveArray = obj.productive
-            if (!productiveArray.includes(domain))
-                productiveArray.push(domain);
-            chrome.storage.local.set({ productive: productiveArray });
-            loadDivs("productive");
-            buttonLoaded("addGoodSiteBtn", "Add");
-    
-        })
-    })
-
-}
 
 async function loadDivs(siteType) {
     var divList = (await chrome.storage.local.get(siteType));
@@ -54,23 +17,16 @@ async function loadDivs(siteType) {
 
 }
 
+function addGoodSite() {
+    const inputURL = document.getElementById("siteToAddGood").value;
+    buttonLoading("addGoodSiteBtn", "Adding...");
+    chrome.runtime.sendMessage({ from: "resolveURL", url: inputURL, siteType: "productive" })
+}
+
 function addBadSite() {
-    var domain = null;
-    try {
-        domain = (new URL(document.getElementById("siteToAddBad").value)).hostname;
-    } catch {
-        alert(document.getElementById("siteToAddGood").value + " is not a valid url")
-        return;
-    }
-
-    chrome.storage.local.get("unproductive").then(obj => {
-        var unproductiveArray = obj.unproductive
-        if (!unproductiveArray.includes(domain))
-            unproductiveArray.push(domain);
-        chrome.storage.local.set({ unproductive: unproductiveArray });
-        loadDivs("unproductive");
-
-    })
+    const inputURL = document.getElementById("siteToAddBad").value;
+    buttonLoading("addBadSiteBtn", "Adding...");
+    chrome.runtime.sendMessage({ from: "resolveURL", url: inputURL, siteType: "unproductive" })
 
 }
 
@@ -134,3 +90,30 @@ function buttonLoaded(buttonId, text) {
     document.getElementById(buttonId).disabled = false;
     document.getElementById(buttonId).textContent = text;
 }
+
+chrome.runtime.onMessage.addListener(message => {
+    if (message.from == "tabtamerBackgroundURLresolved") {
+        console.log("response recieved");
+        console.log(message);
+        const buttonId = message.siteType == "productive" ? "addGoodSiteBtn" : "addBadSiteBtn";
+        if (!message.url) {
+            buttonLoaded(buttonId, "Invalid URL");
+            return;
+        }
+        // console.log("response recieved");
+        // console.log(response);
+        const domain = (new URL(message.url)).hostname;
+        chrome.storage.local.get(message.siteType).then(obj => {
+            var productiveArray = obj[message.siteType]
+            if (!productiveArray.includes(domain))
+                productiveArray.push(domain);
+            if (message.siteType == "productive") {
+                chrome.storage.local.set({ productive: productiveArray });
+            } else {
+                chrome.storage.local.set({ unproductive: productiveArray });
+            }
+            loadDivs(message.siteType);
+            buttonLoaded(buttonId, "Add");
+        })
+    }
+})
