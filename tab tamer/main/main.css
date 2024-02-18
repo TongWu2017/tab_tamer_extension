@@ -124,3 +124,6 @@ input {
     color: #567568;
     border: 2px solid black;
 }
+body {
+    width:250px;
+}

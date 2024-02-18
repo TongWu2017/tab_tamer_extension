@@ -10,6 +10,7 @@ xp = 0;
 level = 1;
 currentState = "x";
 currentRemainingMinutes = -1;
+currentRemainingPeriods = -1;
 
 loadMain();
 
@@ -28,12 +29,14 @@ function requestData() {
     chrome.runtime.sendMessage({ from: "tabtamerRequestPetStatus" })
     chrome.runtime.sendMessage({ from: "tabtamerRequestState", currentState: currentState });
     chrome.runtime.sendMessage({ from: "tabtamerRequestTime", currentRemainingMinutes: currentRemainingMinutes });
+    chrome.runtime.sendMessage({ from: "tabtamerRequestPeriods", currentPeriods: currentRemainingPeriods });
 }
 
 chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
     if (message.from == "tabtamerBackground") {
         // console.log(message);
         updateHTMLAttribute("happybar", "value", message.petStatus.happiness);
+        updateHTMLAttribute("happiness-number", "innerText", message.petStatus.happiness + "/7200");
     }
     if (message.from == "tabtamerBackgroundState") {
         if (message.state == "z") {
@@ -54,6 +57,11 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
         currentRemainingMinutes = message.remainingMinutes;
     }
 
+    if (message.from == "tabtamerBackgroundPeriods") {
+        const x1 = updateHTMLAttribute("periods-remaining-number", "innerHTML", message.periods);
+        if (!x1) return;
+        currentRemainingPeriods = message.periods;
+    }
     if (message.from == "tabtamerBackgroundSiteType") {
         const domain = message.domain;
         if (!domain) return;

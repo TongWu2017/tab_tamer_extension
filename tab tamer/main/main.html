@@ -46,9 +46,10 @@
         <div class="currentpet">
             <h3 class="petname">Pet Name</h3>
             <img class="peticon" width="150px" src="https://static.thenounproject.com/png/11640-200.png">
-            <div class="happiness">
+            <div class="happiness" id="happiness">
                 <img class="happyface" width="30" src="https://cdn-icons-png.flaticon.com/512/5372/5372211.png">
                 <progress id="happybar" max="7200" value="0"></progress>
+                <div id="happiness-number"></div>
             </div>
             <div class="level">
                 <h4>Level: <span id="levelnumber">1</span></h4>
@@ -79,18 +80,18 @@
             </div>
         </div>
 
-        <div id="periods-remaining">
+        <div id="periods-remaining" class="time-input-container">
             <label for="periods-remaining">Periods Remaining:</label>
             <div id="periods-remaining-number"></div>
         </div>
 
-        <div id="current-stage">
+        <div id="current-stage" class="time-input-container">
             <label for="current-stage">Currently:</label>
             <div id="current-stage-text"></div>
         </div>
 
-        <div id="time-remaining">
-            <label for="time-remaining">Time Remaining:</label>
+        <div id="time-remaining" class="time-input-container">
+            <label for="time-remaining">Minutes Remaining:</label>
             <div id="time-remaining-number"></div>
         </div>
 

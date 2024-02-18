@@ -16,6 +16,7 @@ var startTime = -1;
 var productiveMinutes = -1;
 var restMinutes = -1;
 var periods = -1;
+var remainingPeriods = -1;
 var state = 'z'; //1 for productive, 0 for rest, x for unknown, z for not started
 var nextState = 'z';
 
@@ -95,6 +96,11 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
             chrome.runtime.sendMessage({ from: "tabtamerBackgroundState", state: nextState });
         }
     }
+    if (message.from == "tabtamerRequestPeriods") {
+        if (remainingPeriods != message.currentPeriods) {
+            chrome.runtime.sendMessage({ from: "tabtamerBackgroundPeriods", periods: remainingPeriods });
+        }
+    }
     if (message.from == "tabtamerSiteType") {
         chrome.runtime.sendMessage({ from: "tabtamerBackgroundSiteType", domain: currentDomain });
     }
@@ -114,11 +120,8 @@ async function updatePetStatus() {
     if (!statusLoaded) {
         await loadPetStatus();
     }
-
     bghappiness += productive * 60;
     if (productive > 0) bgxp += productive * 60;
-
-
 };
 
 async function loadPetStatus() {
@@ -175,7 +178,9 @@ async function tabUpdate(tabId) {
             updateIcon("#808080");
             productive = 0;
         }
-    } catch {
+    } catch (e) {
+        console.log("tab update error")
+        console.log(e);
         //grey
         updateIcon("#808080");
         productive = 0;
@@ -212,6 +217,7 @@ const updateStateAndRemainingMinutes = () => {
     // console.log("periods passed: " + periodsPassed);
     // console.log("periods: " + periods);
     // console.log("periodsPassed >= periods: " + (periodsPassed >= periods));
+    remainingPeriods = Math.floor(periods - periodsPassed);
     if (periodsPassed >= periods) {
         nextState = 'z';
         // console.log("nextState: " + nextState);
